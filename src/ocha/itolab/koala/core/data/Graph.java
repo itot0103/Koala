@@ -12,7 +12,7 @@ public class Graph {
 	public static int ATTRIBUTE_DISSIM = 2;
 	
 	public String vectorname[];
-	public double clustersizeRatio = 0.5;
+	public double clustersizeRatio = 0.6;
 	public int maxDegree = 0;
 	
 	public ArrayList<Node> nodes = new ArrayList<Node>();

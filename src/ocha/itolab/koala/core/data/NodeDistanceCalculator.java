@@ -41,42 +41,40 @@ public class NodeDistanceCalculator {
 		
 		double ret2 = 0.0;
 		int count = 0;
-		for(int i = 0; i < n1.connected.length; i++) {
-			int id1 = n1.connected[i];
-			for(int j = 0; j < n2.connected.length; j++) {
-				int id2 = n2.connected[j];
+		int num1 = n1.connected.length + n1.connecting.length;
+		int num2 = n2.connected.length + n2.connecting.length;
+		int id1 = 0, id2 = 0;
+		
+		for(int i = 0; i < num1; i++) {
+			if(i < n1.connected.length)
+				id1 = n1.connected[i];
+			else
+				id1 = n1.connecting[i - n1.connected.length];
+			
+			for(int j = 0; j < num2; j++) {
+				if(j < n2.connected.length)
+					id2 = n2.connected[j];
+				else
+					id2 = n2.connecting[j - n2.connected.length];
 				if(id1 == id2) {
 					count++;  break;
 				}
 			}
 		}
-		int num = (n1.connected.length > n2.connected.length)
-				? n1.connected.length : n2.connected.length;
+		/*
+		int num = (num1 > num2) ? num1 : num2;
 		if(num <= 0)
 			ret2 = 1.0;
 		else
 			ret2 = (double)(num - count) / (double)num;
-		
-		count = 0;
-		double ret3 = 0.0;
-		for(int i = 0; i < n1.connecting.length; i++) {
-			int id1 = n1.connecting[i];
-			for(int j = 0; j < n2.connecting.length; j++) {
-				int id2 = n2.connecting[j];
-				if(id1 == id2) {
-					count++;  break;
-				}
-			}
-		}
-		num = (n1.connecting.length > n2.connecting.length)
-				? n1.connecting.length : n2.connecting.length;
+		*/
+		int num = num1 + num2;
 		if(num <= 0)
-			ret3 = 1.0;
+			ret2 = 1.0;
 		else
-			ret3 = (double)(num - count) / (double)num;
+			ret2 = (double)(num - count * 2) / (double)num;
 		
-		
-		ret = clusteringRatio * ret1 + (1.0 - clusteringRatio) * 0.5 * (ret2 + ret3);
+		ret = clusteringRatio * ret1 + (1.0 - clusteringRatio) * ret2;
 		
 		return ret;
 	}

@@ -57,6 +57,14 @@ public class CoAuthotshipConverter {
 		//analyzeTitle();
 		calculateAuthorVector();
 		writeCsvFile();
+		
+		System.out.println("  numnode=" + nodelist.size() + " numedge=" + edgelist.size() + " numtitle=" + titlelist.size());
+		/*
+		for(Node node : nodelist) {
+			int num = node.connected.size() + node.connecting.size();
+			if(num > 20) System.out.println(num);
+		}
+		*/
 	}
 	
 	
@@ -64,6 +72,7 @@ public class CoAuthotshipConverter {
 		openReader(path + infilename);
 		
 		boolean isNode = true;
+		int sourceId = -1, targetId = -1;
 		
 		while(true) {
 			try {
@@ -78,20 +87,22 @@ public class CoAuthotshipConverter {
 					isNode = true;
 				}
 				if(tag.startsWith("edge")) {
-					edge = new Edge();
-					edge.id = edgelist.size();
-					edgelist.add(edge);
 					isNode = false;
 				}
 				if(tag.startsWith("source")) {
-					int nodeId = Integer.parseInt(token.nextToken());
-					edge.n1 = nodelist.get(nodeId);
+					sourceId = Integer.parseInt(token.nextToken());
 				}
 				if(tag.startsWith("target")) {
-					int nodeId = Integer.parseInt(token.nextToken());
-					edge.n2 = nodelist.get(nodeId);
-					edge.n2.connected.add(edge.n1);
-					edge.n1.connecting.add(edge.n2);
+					targetId = Integer.parseInt(token.nextToken());
+					if(sourceId != targetId) {
+						edge = new Edge();
+						edge.id = edgelist.size();
+						edge.n1 = nodelist.get(sourceId);
+						edge.n2 = nodelist.get(targetId);
+						edge.n2.connected.add(edge.n1);
+						edge.n1.connecting.add(edge.n2);
+						edgelist.add(edge);
+					}
 				}
 				if(tag.startsWith("label") && isNode == true) {
 					node.name = "";
@@ -101,7 +112,7 @@ public class CoAuthotshipConverter {
 					node.name = node.name.replace("\"", "");
 					node.name = node.name.replace(",", " ");
 				}
-				if(tag.startsWith("label") && isNode == false) {
+				if(tag.startsWith("label") && isNode == false && edge != null) {
 					edge.name = "";
 					while(token.countTokens() > 0) {
 						edge.name += (token.nextToken() + " ");

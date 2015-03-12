@@ -3,6 +3,7 @@ package ocha.itolab.koala.applet.koalaview;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -10,7 +11,7 @@ import ocha.itolab.koala.core.data.*;
 import ocha.itolab.koala.core.mesh.*;
 
 public class ViewingPanel extends JPanel {
-	static int SMOOTHING_ITERATION = 30;
+	static int SMOOTHING_ITERATION = 100;
 	
 	public JButton  fileOpenButton, placeAgainButton, viewResetButton;
 	public JSlider  bundleDensitySlider, bundleShapeSlider, transparencySlider,
@@ -268,13 +269,25 @@ public class ViewingPanel extends JPanel {
 				canvas.viewReset();
 				canvas.display();			
 				
+				long t1 = System.currentTimeMillis();
+				
 				for(int i = 0; i < SMOOTHING_ITERATION; i++) {
 					MeshTriangulator.triangulate(graph.mesh);
 					MeshSmoother.smooth(graph.mesh, graph.maxDegree);
 					canvas.display();
 				}
 				
+				
+				long t2 = System.currentTimeMillis();
+				System.out.println("[TIME] for mesh operation: " + (t2-t1));
+				
+				long t3 = System.currentTimeMillis();
+				
 				graph.mesh.finalizePosition();
+				
+				long t4 = System.currentTimeMillis();
+				System.out.println("[TIME] for final node&edge operation: " + (t4-t3));
+				
 				canvas.display();
 			}	
 			
@@ -291,7 +304,7 @@ public class ViewingPanel extends JPanel {
 					MeshSmoother.smooth(graph.mesh, graph.maxDegree);
 					canvas.display();
 				}
-
+				
 				graph.mesh.finalizePosition();				
 				canvas.display();			
 			}

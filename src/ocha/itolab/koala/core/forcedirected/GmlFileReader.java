@@ -73,8 +73,8 @@ public class GmlFileReader {
 			for(int i = 0; i < tmpnodelist.size(); i++) {
 				OutputNode on2 = (OutputNode)tmpnodelist.get(i);
 				if(on2.label == nodelist.size()) {
-					nodelist.add(on2);
 					on2.id = on2.label;
+					nodelist.add(on2);
 					tmpnodelist.remove(on2);
 					isFound = true;
 					break;

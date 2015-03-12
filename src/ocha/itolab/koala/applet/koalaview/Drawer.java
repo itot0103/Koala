@@ -49,11 +49,12 @@ public class Drawer implements GLEventListener {
 	double edgeDensityThreshold = 0.1;
 	double linewidth = 1.0;
 	double bundleShape = 0.7;
-	double transparency = 0.9;
+	double transparency = 1.0;
 	boolean colorSwitch[] = null;
 	int edgeDensityMode = 1;
 	int colorMode = 1;
 	double xmin, xmax, ymin, ymax;
+	double bezier0, bezier1, bezier2, bezier3;
 	int rangeX1 = 0, rangeX2 = 0, rangeY1 = 0, rangeY2 = 0;
 	DrawerUtility du = null;
 
@@ -70,6 +71,8 @@ public class Drawer implements GLEventListener {
 	private double size = 0.5;
 	
 	Node pickedNode = null;
+	
+	double grayedgecolor[] = {0.4, 0.4, 0.4};
 	
 	
 	
@@ -421,7 +424,7 @@ public class Drawer implements GLEventListener {
 		if(graph.mesh == null) return;
 		
 		// Draw bundled edges
-		gl2.glColor3d(0.7, 0.7, 0.7);
+		gl2.glColor3d(grayedgecolor[0], grayedgecolor[1], grayedgecolor[2]);
 
 		Mesh mesh = graph.mesh;
 		for(int i = 0; i < mesh.getNumVertices(); i++) {
@@ -457,7 +460,7 @@ public class Drawer implements GLEventListener {
 		if(graph.mesh == null) return;
 		
 		// Draw bundled edges
-		gl2.glColor3d(0.7, 0.7, 0.7);
+		gl2.glColor4d(grayedgecolor[0], grayedgecolor[1], grayedgecolor[2], 0.3);
 		int mindeg = (int)((double)graph.maxDegree * (1.0 - edgeDensityThreshold));
 		
 		Mesh mesh = graph.mesh;
@@ -558,7 +561,11 @@ public class Drawer implements GLEventListener {
 		double z1 = calcZ(n1);
 		double z2 = calcZ(n2);
 		
-		if(bundleShape > 0.5) {
+		if(bundleShape > 0.75) {
+			p1[0] = v1pos[0];   p1[1] = v1pos[1];
+			p2[0] = v2pos[0];   p2[1] = v2pos[1];
+		}
+		else if(bundleShape > 0.5) {
 			double ratio = (bundleShape + 0.5) * 2.0 * ONE_THIRD;
 			p1[0] = v1pos[0] * ratio + v2pos[0] * (1.0 - ratio);
 			p1[1] = v1pos[1] * ratio + v2pos[1] * (1.0 - ratio);
@@ -576,18 +583,17 @@ public class Drawer implements GLEventListener {
 			p2[1] = (v2pos[1] * 2.0 + v1pos[1]) * ONE_THIRD * ratio
 					  + (p3[1] * 2.0 + p0[1]) * ONE_THIRD * (1.0 - ratio);
 		}
-		
+
 		
 		double pt[] = new double[2];
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 		for(int i = 0; i <= NUM_T; i++) {
 			double interval = 1.0 / (double)NUM_T;
 			double t0 = interval * (double)i;
-			double t1 = 1.0 - t0;
+			calcBezierCofficient(t0);
 			
 			for(int j = 0; j < 2; j++) 
-				pt[j] = p0[j] * t1 * t1 * t1 + p1[j] * 3.0 * t0 * t1 * t1
-				      + p2[j] * 3.0 * t0 * t0 * t1 + p3[j] * t0 * t0 * t0; 
+				pt[j] = p0[j] * bezier0 + p1[j] * bezier1 + p2[j] * bezier2 + p3[j] * bezier3; 
 			
 			double z = (z1 * (NUM_T - i) + z2 * i) / (double)NUM_T;
 			gl2.glVertex3d(pt[0], pt[1], z);
@@ -600,6 +606,8 @@ public class Drawer implements GLEventListener {
 	
 	
 	void drawNodes() {
+		double SQUARE_MAGNITUDE_RATIO = 2.0;
+		
 		if(graph == null) return;
 		float colf[] = new float[3];
 		
@@ -613,17 +621,18 @@ public class Drawer implements GLEventListener {
 			if(colorMode == Canvas.COLOR_DEGREE) {
 				double dratio = (double)(node.getNumConnectedEdge() + node.getNumConnectingEdge()) / (double)graph.maxDegree;
 				//dratio = Math.sqrt(dratio);
-				double rr = 1.0 * dratio + 0.5 * (1.0 - dratio);
-				double gg = 0.0 * dratio + 0.5 * (1.0 - dratio);
-				double bb = 0.0 * dratio + 0.5 * (1.0 - dratio);
+				double rr = 1.0 * dratio + 0.2 * (1.0 - dratio);
+				double gg = 0.0 * dratio + 0.2 * (1.0 - dratio);
+				double bb = 0.0 * dratio + 0.2 * (1.0 - dratio);
 				double z = calcZ(node);
 				if(z > 0.01) {
 					colf[0] = (float)rr;
 					colf[1] = (float)gg;
 					colf[2] = (float)bb;
+					double size2 = SQUARE_SIZE * (z * SQUARE_MAGNITUDE_RATIO + 1.0);
 					gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 							GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
-					drawOneBarWithHeight(x, y, z, SQUARE_SIZE);
+					drawOneBarWithHeight(x, y, z, size2);
 					
 				}
 				else {
@@ -645,7 +654,7 @@ public class Drawer implements GLEventListener {
 			
 			int colorId = node.getColorId();
 			if(colorId < 0) {
-				colf[0] = colf[1] = colf[2] = 0.5f;
+				colf[0] = colf[1] = colf[2] = 0.2f;
 				gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 						GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
 				gl2.glBegin(GL2.GL_POLYGON);
@@ -668,9 +677,10 @@ public class Drawer implements GLEventListener {
 					colf[0] = (float)rr;
 					colf[1] = (float)gg;
 					colf[2] = (float)bb;
+					double size2 = SQUARE_SIZE * (z * SQUARE_MAGNITUDE_RATIO + 1.0);
 					gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 							GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
-					drawOneBarWithHeight(x, y, z, SQUARE_SIZE);
+					drawOneBarWithHeight(x, y, z, size2);
 					
 				}
 				else {
@@ -737,6 +747,29 @@ public class Drawer implements GLEventListener {
 		gl2.glVertex3d(x - SQUARE_SIZE, y + SQUARE_SIZE, z);
 		gl2.glEnd();
 	}
+	
+	
+	void calcBezierCofficient(double t0) {
+		double t1 = 1.0 - t0;
+		bezier0 = t1 * t1 * t1;
+		bezier1 = 3.0 * t0 * t1 * t1;
+		bezier2 = 3.0 * t0 * t0 * t1;
+		bezier3 = t0 * t0 * t0; 
+		
+		if(bundleShape > 0.75) {
+			double pow = (bundleShape - 0.75) * 30.0 + 1.0;
+			bezier0 = Math.pow(bezier0, pow);
+			bezier3 = Math.pow(bezier3, pow);
+			double len = bezier0  + bezier1  + bezier2  + bezier3;
+			bezier0 /= len;
+			bezier1 /= len;
+			bezier2 /= len;
+			bezier3 /= len;
+		}
+		
+	}
+	
+	
 	
 	public Object pick(int cx, int cy) {
 		double PICK_DIST = 20.0;

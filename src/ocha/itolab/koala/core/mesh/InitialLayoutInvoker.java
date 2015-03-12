@@ -19,11 +19,11 @@ public class InitialLayoutInvoker {
 	static Vector nodelist = new Vector();
 	static Vector fixlist = new Vector();
 	
-	static int LINLOG = 1;
-	static int READGML = 2;
+	static int LINLOG = 1; // calculate by LinLog (in ocha.itolab.koala.core.forcedirected)
+	static int READGML = 2; // calculate by GML library
 	static int method = LINLOG;
 	static String path = "C:/itot/projects/FRUITSNet/Koala/ogdf-layout/";
- 	static String filename = "edges_fme.gml";
+ 	static String filename = "edges_sm.gml";
 	
 	/**
 	 * Execute
@@ -161,7 +161,7 @@ public class InitialLayoutInvoker {
 		
 		try {
 			 writer = new BufferedWriter(
-			    		new FileWriter(new File("edges.csv")));
+			    		new FileWriter(new File(path + "edges.csv")));
 			 if(writer == null) return;
 			 
 			 for(int i = 0; i < edgelist.size(); i++) {

@@ -7,6 +7,7 @@ public class MeshSmoother {
 	static double idealDistance = 0.05;
 	static double maxMovement = 0.005;
 	static double tooSmall = 1.0e-10;
+	static double littleMove = 1.0e-4;
 	static int maxDegree = 0;
 	
 	static Mesh mesh;
@@ -41,7 +42,10 @@ public class MeshSmoother {
 				diff[1] = p0[1] - p1[1];
 				double difflen = Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]);
 				if(difflen > idist) continue;
-				if(difflen < tooSmall) continue;
+				if(difflen < tooSmall) {
+					v0.setPosition(p0[0] + littleMove, p0[1] + littleMove, p0[2]);
+					continue;
+				}
 				diff[0] *= (0.5 * idist / difflen);
 				diff[1] *= (0.5 * idist / difflen);
 				

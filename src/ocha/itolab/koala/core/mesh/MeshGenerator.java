@@ -14,15 +14,17 @@ import ocha.itolab.koala.core.forcedirected.*;
 public class MeshGenerator {
 	static int CLUSTERING_BYMYSELF = 1;
 	static int CLUSTERING_EXTERNAL = 2;
-	static int clusteringMode = 1;
+	static int clusteringMode = CLUSTERING_BYMYSELF;
 	
 	static double clusteringThreshold = 1.1;
-	static int clusteringMaxIteration = 50;
+	static int clusteringMaxIteration = 100;
 
 	
 	
 	public static Mesh generate(Graph g) {
 		Mesh m = new Mesh();
+		
+		long t1 = System.currentTimeMillis();
 		
 		if(clusteringMode == CLUSTERING_BYMYSELF) {
 			
@@ -30,21 +32,32 @@ public class MeshGenerator {
 			generateVertices(m, g);
 			clusterVertices(m, g);
 		}
-		
 		if(clusteringMode == CLUSTERING_EXTERNAL) {
 			writeEdgeFile(g);
 			readClusteringFile(g, m);
 		}
 		
 		
+		long t2 = System.currentTimeMillis();
+		System.out.println("[TIME] for clustering: " + (t2-t1) + " clusterSize=" + g.clustersizeRatio);
+		 
+		long t3 = System.currentTimeMillis();
+		
 		// Calculate distances between vertices
-		calcDistances(m, g);
+		calcDistancesForLayout(m, g);
 		
 		// Calculate initial positions of vertices
 		InitialLayoutInvoker.exec(g, m);
 		
+		long t4 = System.currentTimeMillis();
+		System.out.println("[TIME] for force-directed: " + (t4-t3));
+		
+		
 		// Delaunay triangulation
 		MeshTriangulator.triangulate(m);
+		
+		// for test
+		printStatistics(m, g);
 		
 		return m;
 	}
@@ -105,6 +118,9 @@ public class MeshGenerator {
 						Node n2 = (Node)v2.nodes.get(jj);
 						if(n1.getDisSim2(n2.getId()) > maxdis) {
 							maxdis = n1.getDisSim2(n2.getId());
+							if(maxdis > mindis) {
+								ii = v1.nodes.size();  break;
+							}
 						}
 					}
 				}
@@ -128,17 +144,18 @@ public class MeshGenerator {
 			
 				// for each pair of the nodes
 				double maxdis = -1.0;
-				String authors = "";
 				for(int ii = 0; ii < v1.nodes.size(); ii++) {
 					Node n1 = (Node)v1.nodes.get(ii);
 					for(int jj = 0; jj < v2.nodes.size(); jj++) {
 						Node n2 = (Node)v2.nodes.get(jj);
 						if(n1.getDisSim2(n2.getId()) > maxdis) {
 							maxdis = n1.getDisSim2(n2.getId());
-							authors = n1.getDescription(0) + "," + n2.getDescription(0);
+							if(maxdis > threshold) {
+								ii = v1.nodes.size();  break;
+							}
 						}
 					}
-				}				
+				}
 				if(maxdis > threshold) continue;
 				
 				//System.out.println("   combine: i=" + i + " j=" + j + " names=" + authors + " maxdis=" + maxdis + " th=" + threshold);
@@ -163,7 +180,7 @@ public class MeshGenerator {
 	/**
 	 * Calculate dissimilarity between pairs of vertices
 	 */
-	static void calcDistances(Mesh mesh, Graph graph) {
+	static void calcDistancesForLayout(Mesh mesh, Graph graph) {
 		graph.setupDissimilarityForPlacement();
 
 		// Setup an array for dissimilarity calculation
@@ -238,40 +255,11 @@ public class MeshGenerator {
 	
 	
 	
-	static void writeEdgeFile(Graph graph) {
-		BufferedWriter writer;
-		
-		try {
-			 writer = new BufferedWriter(
-			    		new FileWriter(new File("clusteredges.txt")));
-			 if(writer == null) return;
-			 
-			for(int i = 0; i < graph.edges.size(); i++) {
-				Edge e = graph.edges.get(i);
-				Node nodes[] = e.getNode();
-				String line = nodes[0].getId() + " " + nodes[1].getId();
-				writer.write(line, 0, line.length());
-				writer.flush();
-				writer.newLine();
-			}
-			
-			writer.close();
-			
-		} catch (Exception e) {
-			System.err.println(e);
-			writer = null;
-			return;
-		}
-		
-		
-	}
 
-	
-	
 	
 	static String path = "C:/itot/projects/FRUITSNet/Koala/lib/";
 	static String filename = "polbooks-clustering.txt";
-	static int HIERARCHY_LEVEL = 1;
+	static int HIERARCHY_LEVEL = 2;
 	
 	static void readClusteringFile(Graph graph, Mesh mesh) {
 		BufferedReader reader;
@@ -324,6 +312,106 @@ public class MeshGenerator {
 			System.err.println(e);
 		}
 	}
+
+	
+	static void writeEdgeFile(Graph graph) {
+		BufferedWriter writer;
+		
+		try {
+			 writer = new BufferedWriter(
+			    		new FileWriter(new File(path + "clusteredges.txt")));
+			 if(writer == null) return;
+			 
+			for(int i = 0; i < graph.edges.size(); i++) {
+				Edge e = graph.edges.get(i);
+				Node nodes[] = e.getNode();
+				String line = nodes[0].getId() + " " + nodes[1].getId();
+				writer.write(line, 0, line.length());
+				writer.flush();
+				writer.newLine();
+			}
+			
+			writer.close();
+			
+		} catch (Exception e) {
+			System.err.println(e);
+			writer = null;
+			return;
+		}
+		
+		
+	}
+
+	
+	
+	
+	
+	
+	static int numedgeHisto[] = new int[11];
+	
+	/**
+	 * Print statistics for test
+	 */
+	static void printStatistics(Mesh mesh, Graph graph) {
+		
+		System.out.println("   Clustering result: vertices=" + mesh.getNumVertices());
+		
+		int sumEdges = 0, sumConnected = 0;
+		int sumHubCsize = 0, sumHub = 0;
+		
+		for(int i = 0; i < mesh.getNumVertices(); i++) {
+			Vertex v1 = mesh.getVertex(i);
+			ArrayList<Node> nodes1 = v1.getNodes();
+			for(int j = (i + 1); j < mesh.getNumVertices(); j++) {
+				Vertex v2 = mesh.getVertex(j);
+				ArrayList<Node> nodes2 = v2.getNodes();
+				
+				int count = 0;
+				for(int ii = 0; ii < nodes1.size(); ii++) {
+					Node n1 = nodes1.get(ii);	
+					for(int jj = 0; jj < nodes2.size(); jj++) {
+						Node n2 = nodes2.get(jj);
+						if(graph.isTwoNodeConnected(n1, n2) == true)
+							count++;
+					}
+				}
+				if(count > 0) {
+					sumEdges += count;   sumConnected++;
+					int id = count / 1;
+					id = (id > 10) ? 10 : id;
+					numedgeHisto[id]++;
+				}
+			}
+			
+			for(int ii = 0; ii < nodes1.size(); ii++) {
+				Node n1 = nodes1.get(ii);	
+				int nc = n1.getNumConnectedEdge() + n1.getNumConnectingEdge();
+				if(nc < graph.maxDegree * 0.333333) continue;
+				sumHub++;   sumHubCsize += nodes1.size();
+			}
+		}
+		
+		double aveHubCsize = (double)sumHubCsize / (double)sumHub;
+		System.out.println("    ... sumHub=" + sumHub + " aveHubCsize=" + aveHubCsize);
+		
+		double aveEdges = (double)sumEdges / (double)sumConnected;
+		System.out.println("    ... sumEdges=" + sumEdges + " aveEdges=" + aveEdges);
+		
+		for(int i = 0; i <= 10; i++)
+			System.out.print(" histo[" + i + "]=" + numedgeHisto[i]);
+		System.out.println("");
+
+	
+		int numInEdge = 0;
+		for(Edge edge : graph.edges) {
+			Node nodes[] = edge.getNode();
+			if(nodes[0].getVertex() == nodes[1].getVertex())
+				numInEdge++;
+		}
+		System.out.println("  numInEdge=" + numInEdge);
+	
+	}
+	
 	
 }
 	
