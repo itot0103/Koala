@@ -53,6 +53,5 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/itot/projects/FRUITSNet/Koala/lib/mdsj.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

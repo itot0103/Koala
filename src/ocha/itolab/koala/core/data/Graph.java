@@ -2,7 +2,6 @@ package ocha.itolab.koala.core.data;
 
 import java.util.*;
 
-import mdsj.MDSJ;
 import ocha.itolab.koala.core.mesh.*;
 
 

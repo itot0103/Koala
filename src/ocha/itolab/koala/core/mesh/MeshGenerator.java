@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
 
-import mdsj.MDSJ;
+
 import ocha.itolab.koala.core.data.*;
 import ocha.itolab.koala.core.forcedirected.*;
 
