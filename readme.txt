@@ -1,5 +1,5 @@
 Koala (Key-node Out Arrangement and LAyout)
-by Takayuki Itoh (Ochanomizu University, Japan)
+by Takayuki Itoh (Ochanomizu University, Japan, E-mail:itot(at)is.ocha.ac.jp)
 
 Implementation of graph visualization technique published as follows:
 T. Itoh, K. Klein, Key-node-Separated Graph Clustering and Layout for Human Relationship Graph Visualization, IEEE Computer Graphics and Applications, Vol. 35, No. 6, pp. 30-40, 2015.
@@ -31,4 +31,4 @@ Data file format (Please prepare as CSV files):
 
 4) Description of a feature vector of a node
     (nodeId),(value1),(value2),....
-* number of values must be same as number of names described in #vector line. 
+* number of values must be same as number of names described in #vector line.
