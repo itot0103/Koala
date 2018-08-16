@@ -13,11 +13,12 @@ import ocha.itolab.koala.core.mesh.*;
 public class ViewingPanel extends JPanel {
 	static int SMOOTHING_ITERATION = 100;
 	
-	public JButton  fileOpenButton, placeAgainButton, viewResetButton;
+	public JButton  fileOpenButton, placeAgainButton, viewResetButton, imageSaveButton;
 	public JSlider  bundleDensitySlider, bundleShapeSlider, transparencySlider,
 		placeRatioSlider, clusteringRatioSlider, clusterSizeSlider, keyEmphasisSlider;
 	public JRadioButton edgeDissimilarityButton, edgeDegreeButton, clickButton, moveButton, 
-		colorTopicButton, colorDegreeButton;
+		colorTopicButton, colorDegreeButton, saveAIButton, saveULButton, saveURButton, saveLLButton, saveLRButton;
+	public JTextField filenameField;
 	public Container container;
 	JTabbedPane pane = null;
 	VectorPanel vecpanel = null;
@@ -37,6 +38,9 @@ public class ViewingPanel extends JPanel {
 	CheckBoxListener cbl = null;
 	SliderListener sl = null;
 	
+	int saveflag = Drawer.SAVE_AS_IS;
+	
+	
 	public ViewingPanel() {
 		// super class init
 		super();
@@ -46,10 +50,12 @@ public class ViewingPanel extends JPanel {
 		// ファイル入力のパネル
 		//
 		JPanel p1 = new JPanel();
-		p1.setLayout(new GridLayout(6,1));
+		p1.setLayout(new GridLayout(7,1));
 		fileOpenButton = new JButton("File Open");
+		filenameField = new JTextField("");
 		viewResetButton = new JButton("View Reset");
 		p1.add(fileOpenButton);
+		p1.add(filenameField);
 		p1.add(viewResetButton);
 		edgeDissimilarityButton = new JRadioButton("Num. Edge by Dissimilarity");
 		edgeDegreeButton = new JRadioButton("Num. Edge by Degree");
@@ -58,7 +64,6 @@ public class ViewingPanel extends JPanel {
 		p1.add(edgeDegreeButton);
 		group1.add(edgeDissimilarityButton);
 		group1.add(edgeDegreeButton);
-		
 		clickButton = new JRadioButton("React by Click");
 		moveButton = new JRadioButton("React by Move");
 		ButtonGroup group2 = new ButtonGroup();
@@ -112,6 +117,27 @@ public class ViewingPanel extends JPanel {
 		p3.add(new JLabel("Cluster Size Ratio (Small <-> Large)"));
 		p3.add(clusterSizeSlider);
 		
+		JPanel p4 = new JPanel();
+		p4.setLayout(new GridLayout(6, 1));
+		imageSaveButton = new JButton("Image Save");
+		p4.add(imageSaveButton);
+		ButtonGroup group4 = new ButtonGroup();
+		saveAIButton = new JRadioButton("As Is");
+		saveULButton = new JRadioButton("Upper Left");
+		saveURButton = new JRadioButton("Upper Right");
+		saveLLButton = new JRadioButton("Lower Left");
+		saveLRButton = new JRadioButton("Lower Right");
+		p4.add(saveAIButton);
+		p4.add(saveULButton);
+		p4.add(saveURButton);
+		p4.add(saveLLButton);
+		p4.add(saveLRButton);
+		group4.add(saveAIButton);
+		group4.add(saveULButton);
+		group4.add(saveURButton);
+		group4.add(saveLLButton);
+		group4.add(saveLRButton);
+		
 		//
 		// パネル群のレイアウト
 		//
@@ -120,6 +146,7 @@ public class ViewingPanel extends JPanel {
 		pp.add(p1);
 		pp.add(p2);
 		pp.add(p3);
+		pp.add(p4);
 		
 		pane = new JTabbedPane();
 		pane.add(pp);
@@ -215,6 +242,11 @@ public class ViewingPanel extends JPanel {
 		moveButton.addActionListener(actionListener);
 		colorDegreeButton.addActionListener(actionListener);
 		colorTopicButton.addActionListener(actionListener);
+		saveAIButton.addActionListener(actionListener);
+		saveULButton.addActionListener(actionListener);
+		saveURButton.addActionListener(actionListener);
+		saveLLButton.addActionListener(actionListener);
+		saveLRButton.addActionListener(actionListener);
 	}
 
 	/**
@@ -224,6 +256,7 @@ public class ViewingPanel extends JPanel {
 	public void addButtonListener(ActionListener actionListener) {
 		fileOpenButton.addActionListener(actionListener);
 		placeAgainButton.addActionListener(actionListener);
+		imageSaveButton.addActionListener(actionListener);
 		viewResetButton.addActionListener(actionListener);
 	}
 	
@@ -262,7 +295,9 @@ public class ViewingPanel extends JPanel {
 				// ファイルを指定する
 				fileOpener.setCanvas(canvas);
 				File datafile = fileOpener.getFile();
+				String filename = datafile.getName();
 				currentDirectory = fileOpener.getCurrentDirectory();
+				filenameField.setText(filename);
 				graph = fileOpener.readFile(datafile);
 				canvas.setGraph(graph);
 				generatePanels();
@@ -288,6 +323,7 @@ public class ViewingPanel extends JPanel {
 				long t4 = System.currentTimeMillis();
 				System.out.println("[TIME] for final node&edge operation: " + (t4-t3));
 				
+				//TulipFileWriter.write(graph);
 				canvas.display();
 			}	
 			
@@ -305,9 +341,18 @@ public class ViewingPanel extends JPanel {
 					canvas.display();
 				}
 				
-				graph.mesh.finalizePosition();				
+				graph.mesh.finalizePosition();	
+				//TulipFileWriter.write(graph);
 				canvas.display();			
 			}
+			
+			
+			if(buttonPushed == imageSaveButton) {
+				canvas.saveImageFile(saveflag);
+				canvas.display();
+				canvas.display();
+			}
+			
 			
 			if(buttonPushed == viewResetButton) {
 				canvas.viewReset();
@@ -344,6 +389,21 @@ public class ViewingPanel extends JPanel {
 			if(buttonPushed == colorDegreeButton) {
 				canvas.setColorMode(canvas.COLOR_DEGREE);
 				canvas.display();
+			}
+			if(buttonPushed == saveAIButton) {
+				saveflag = Drawer.SAVE_AS_IS;
+			}
+			if(buttonPushed == saveULButton) {
+				saveflag = Drawer.SAVE_UPPER_LEFT;
+			}
+			if(buttonPushed == saveURButton) {
+				saveflag = Drawer.SAVE_UPPER_RIGHT;
+			}
+			if(buttonPushed == saveLLButton) {
+				saveflag = Drawer.SAVE_LOWER_LEFT;
+			}
+			if(buttonPushed == saveLRButton) {
+				saveflag = Drawer.SAVE_LOWER_RIGHT;
 			}
 		}
 	}

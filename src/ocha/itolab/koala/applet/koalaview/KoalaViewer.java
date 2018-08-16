@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.*;
 import java.io.*;
 
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLCanvas;
 import javax.swing.*;
 
 public class KoalaViewer extends JApplet {

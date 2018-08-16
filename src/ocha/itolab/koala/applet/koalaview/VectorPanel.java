@@ -26,6 +26,7 @@ public class VectorPanel extends JPanel {
 		
 		if(g == null) return;
 		graph = g;
+		
 		dimensionChecks = new JCheckBox[graph.vectorname.length];
 		JPanel p1 = new JPanel();
 		p1.setLayout(new GridLayout(graph.vectorname.length, 1));
@@ -41,11 +42,12 @@ public class VectorPanel extends JPanel {
 		canvas.setColorSwitch(colorSwitch);
 		
 		VectorParettePanel p2 = new VectorParettePanel(graph);	
-
+		
 		JPanel p0 = new JPanel();
 		p0.setLayout(new GridLayout(1, 2));
 		p0.add(p1);
 		p0.add(p2);
+		
 		
 		JScrollPane scroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 		        	JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -79,8 +81,10 @@ public class VectorPanel extends JPanel {
 	 * @param actionListener ActionListener
 	 */
 	public void addCheckBoxListener(CheckBoxListener checkBoxListener) {
+		/*
 		for(int i = 0; i < dimensionChecks.length; i++)
 			dimensionChecks[i].addItemListener(checkBoxListener);
+			*/
 	}
 	
 	/**

@@ -13,11 +13,11 @@ import ocha.itolab.koala.core.forcedirected.*;
 
 public class MeshGenerator {
 	static int CLUSTERING_BYMYSELF = 1;
-	static int CLUSTERING_EXTERNAL = 2;
+	static int CLUSTERING_LINLOG = 2;
 	static int clusteringMode = CLUSTERING_BYMYSELF;
 	
 	static double clusteringThreshold = 1.1;
-	static int clusteringMaxIteration = 100;
+	static int clusteringMaxIteration = 30;
 
 	
 	
@@ -32,9 +32,8 @@ public class MeshGenerator {
 			generateVertices(m, g);
 			clusterVertices(m, g);
 		}
-		if(clusteringMode == CLUSTERING_EXTERNAL) {
-			writeEdgeFile(g);
-			readClusteringFile(g, m);
+		if(clusteringMode == CLUSTERING_LINLOG) {
+			MeshGeneratorLinLog.execute(m, g);
 		}
 		
 		
@@ -180,7 +179,7 @@ public class MeshGenerator {
 	/**
 	 * Calculate dissimilarity between pairs of vertices
 	 */
-	static void calcDistancesForLayout(Mesh mesh, Graph graph) {
+	public static void calcDistancesForLayout(Mesh mesh, Graph graph) {
 		graph.setupDissimilarityForPlacement();
 
 		// Setup an array for dissimilarity calculation
@@ -354,7 +353,7 @@ public class MeshGenerator {
 	 */
 	static void printStatistics(Mesh mesh, Graph graph) {
 		
-		System.out.println("   Clustering result: vertices=" + mesh.getNumVertices());
+		//System.out.println("   Clustering result: vertices=" + mesh.getNumVertices());
 		
 		int sumEdges = 0, sumConnected = 0;
 		int sumHubCsize = 0, sumHub = 0;
@@ -392,16 +391,18 @@ public class MeshGenerator {
 		}
 		
 		double aveHubCsize = (double)sumHubCsize / (double)sumHub;
-		System.out.println("    ... sumHub=" + sumHub + " aveHubCsize=" + aveHubCsize);
+		//System.out.println("    ... sumHub=" + sumHub + " aveHubCsize=" + aveHubCsize);
 		
 		double aveEdges = (double)sumEdges / (double)sumConnected;
-		System.out.println("    ... sumEdges=" + sumEdges + " aveEdges=" + aveEdges);
+		//System.out.println("    ... sumEdges=" + sumEdges + " aveEdges=" + aveEdges);
 		
+		/*
 		for(int i = 0; i <= 10; i++)
 			System.out.print(" histo[" + i + "]=" + numedgeHisto[i]);
 		System.out.println("");
-
+		*/
 	
+		/*
 		int numInEdge = 0;
 		for(Edge edge : graph.edges) {
 			Node nodes[] = edge.getNode();
@@ -409,7 +410,7 @@ public class MeshGenerator {
 				numInEdge++;
 		}
 		System.out.println("  numInEdge=" + numInEdge);
-	
+		*/
 	}
 	
 	

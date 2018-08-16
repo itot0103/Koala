@@ -1,14 +1,15 @@
 package ocha.itolab.koala.applet.koalaview;
 
 import java.util.*;
+import java.nio.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.awt.GLCanvas;
 
 import ocha.itolab.koala.core.data.*;
 
@@ -148,8 +149,8 @@ public class Canvas extends JPanel {
 		glAD = drawer.getGLAutoDrawable();
 		if (glAD == null) return;
 				
-		drawer.getGLAutoDrawable();
-		drawer.setWindowSize(width, height);
+		//drawer.getGLAutoDrawable();
+		//drawer.setWindowSize(width, height);
 		glAD.display();
 
 	}
@@ -157,24 +158,8 @@ public class Canvas extends JPanel {
 	/**
 	 * 画像ファイルに出力する
 	 */
-	public void saveImageFile(File file) {
-
-		width = (int) getSize().getWidth();
-		height = (int) getSize().getHeight();
-		image = new BufferedImage(width, height, 
-                BufferedImage.TYPE_INT_BGR);
-		
-		/*
-		Graphics2D gg2 = image.createGraphics();
-		gg2.clearRect(0, 0, width, height);
-		b_drawer.draw(gg2);
-		d_drawer.draw(gg2);
-		try {
-			ImageIO.write(image, "bmp", file);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}	
-		*/	
+	public void saveImageFile(int saveflag) {
+		drawer.setSaveImage(saveflag);
 	}
 	
 	

@@ -34,7 +34,7 @@ public class InitialLayoutInvoker {
 		constructEdge();
 
 		// for test
-		writeEdgeFile();
+		//writeEdgeFile();
 				
 		if(method == LINLOG)
 			LinLogLayout.exec(edgelist, nodelist, null);
@@ -44,7 +44,7 @@ public class InitialLayoutInvoker {
 		calcNodePosition();
 		
 		// for test
-		printEdgeLength();
+		//printEdgeLength();
 	}
 	
 	
@@ -161,7 +161,7 @@ public class InitialLayoutInvoker {
 		
 		try {
 			 writer = new BufferedWriter(
-			    		new FileWriter(new File(path + "edges.csv")));
+			    		new FileWriter(new File(path + "edges_sm.csv")));
 			 if(writer == null) return;
 			 
 			 for(int i = 0; i < edgelist.size(); i++) {

@@ -44,6 +44,7 @@ public class Graph {
 					e = new Edge();
 					e.id = edges.size();
 					edges.add(e);
+					edgemap.put(key, e);
 					Node node2 = nodes.get(id);
 					e.nodes[0] = node;
 					e.nodes[1] = node2;
@@ -61,6 +62,7 @@ public class Graph {
 					e = new Edge();
 					e.id = edges.size();
 					edges.add(e);
+					edgemap.put(key, e);
 					Node node2 = nodes.get(id);
 					e.nodes[0] = node2;
 					e.nodes[1] = node;

@@ -52,6 +52,12 @@ import java.util.Vector;
  */
 public class LinLogLayout {
 	
+	static ArrayList<double[]> initialpos = null;
+	public static void setInitialPositionList(ArrayList<double[]> list) {
+		initialpos = list;
+	}
+	
+	
 	/**
 	 * Reads and returns a graph from the specified file.
 	 * The graph is returned as a nested map: Each source node 
@@ -63,7 +69,7 @@ public class LinLogLayout {
 	 * @param filename name of the file to read from.
 	 * @return read graph.
 	 */
-	private static Map<String,Map<String,Double>> readGraph(String filename) {
+	public static Map<String,Map<String,Double>> readGraph(String filename) {
 		Map<String,Map<String,Double>> result = new HashMap<String,Map<String,Double>>();
 		try {
 			BufferedReader file = new BufferedReader(new FileReader(filename));
@@ -95,7 +101,7 @@ public class LinLogLayout {
 	 * Schematically, source -> target -> edge weight.
 	 *
 	 */
-	private static Map<String,Map<String,Double>> constructGraph(Vector edgelist) {
+	public static Map<String,Map<String,Double>> constructGraph(Vector edgelist) {
 		Map<String,Map<String,Double>> result = new HashMap<String,Map<String,Double>>();
 		
 		for(int i = 0; i < edgelist.size(); i++) {
@@ -120,7 +126,7 @@ public class LinLogLayout {
 	 * @param graph  possibly unsymmetric graph.
 	 * @return symmetric version of the given graph.
 	 */
-	private static Map<String,Map<String,Double>> makeSymmetricGraph
+	public static Map<String,Map<String,Double>> makeSymmetricGraph
 			(Map<String,Map<String,Double>> graph) {
 		Map<String,Map<String,Double>> result = new HashMap<String,Map<String,Double>>();
 		for (String source : graph.keySet()) {
@@ -147,7 +153,7 @@ public class LinLogLayout {
 	 * @param graph the graph.
 	 * @return map from each node names to nodes.
 	 */
-	private static Map<String,FdNode> makeNodes(Map<String,Map<String,Double>> graph) {
+	public static Map<String,FdNode> makeNodes(Map<String,Map<String,Double>> graph) {
 		Map<String,FdNode> result = new HashMap<String,FdNode>();
 		for (String nodeName : graph.keySet()) {
             double nodeWeight = 0.0;
@@ -166,7 +172,7 @@ public class LinLogLayout {
      * @param nameToNode map from node names to nodes.
      * @return the given graph as list of edges.
      */
-    private static List<FdEdge> makeEdges(Map<String,Map<String,Double>> graph, 
+    public static List<FdEdge> makeEdges(Map<String,Map<String,Double>> graph, 
             Map<String,FdNode> nameToNode) {
         List<FdEdge> result = new ArrayList<FdEdge>();
         for (String sourceName : graph.keySet()) {
@@ -200,6 +206,7 @@ public class LinLogLayout {
     	return ret;
     }
     
+    
 	/**
 	 * Returns, for each node in a given list,
 	 * a random initial position in two- or three-dimensional space. 
@@ -208,18 +215,23 @@ public class LinLogLayout {
      * @param is3d initialize 3 (instead of 2) dimension with random numbers.
 	 * @return map from each node to a random initial positions.
 	 */
-	private static Map<FdNode,double[]> makeInitialPositions(List<FdNode> nodes, boolean is3d) {
+	public static Map<FdNode,double[]> makeInitialPositions(List<FdNode> nodes, boolean is3d) {
         Map<FdNode,double[]> result = new HashMap<FdNode,double[]>();
         int counter = 0;
-        for (FdNode node : nodes) {
-			
+        for (int i = 0; i < nodes.size(); i++) {
+        	FdNode node = nodes.get(i);
+        	
         	/*
             double[] position = { Math.random() - 0.5,
                                   Math.random() - 0.5,
                                   is3d ? Math.random() - 0.5 : 0.0 };
             */
         	
-			double[] position = { myRandom(counter, 0) - 0.5,
+			double[] position = null;
+			if(initialpos != null) 
+				position = initialpos.get(i);
+			else position = new double[]
+					{ myRandom(counter, 0) - 0.5,
                     myRandom(counter, 1) - 0.5,
                     is3d ? Math.random() - 0.5 : 0.0 };
             
@@ -235,7 +247,7 @@ public class LinLogLayout {
 	 * @param nodeToPosition
 	 * @param fixlist
 	 */
-	private static void setFixNodes(
+	public static void setFixNodes(
 			Map<String,FdNode>nameToNode, Map<FdNode,double[]>nodeToPosition, Vector fixlist) {
 	
 		// ŒÅ’è“_‚ª‚È‚¯‚ê‚Îreturn

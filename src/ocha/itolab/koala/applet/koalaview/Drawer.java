@@ -1,19 +1,22 @@
 package ocha.itolab.koala.applet.koalaview;
 
 import java.awt.*;
+import java.io.*;
 import java.awt.geom.*;
 import java.awt.image.*;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.gl2.GLUgl2;
+import javax.imageio.ImageIO;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.gl2.GLUgl2;
 
 import com.jogamp.opengl.util.gl2.GLUT;
 
@@ -42,7 +45,7 @@ public class Drawer implements GLEventListener {
 
 	DoubleBuffer modelview, projection, p1, p2, p3, p4;
 	IntBuffer viewport;
-	int windowWidth, windowHeight;
+	int windowX, windowY, windowWidth, windowHeight;
 	
 	boolean isMousePressed = false, isAnnotation = true;
 
@@ -71,8 +74,16 @@ public class Drawer implements GLEventListener {
 	private double size = 0.5;
 	
 	Node pickedNode = null;
+	int savemode = SAVE_AS_IS;
+	boolean saveImageFlag = false;
 	
 	double grayedgecolor[] = {0.4, 0.4, 0.4};
+	
+	public static int SAVE_AS_IS = 0;
+	public static int SAVE_UPPER_LEFT = 1;
+	public static int SAVE_UPPER_RIGHT = 2;
+	public static int SAVE_LOWER_LEFT = 3;
+	public static int SAVE_LOWER_RIGHT = 4;
 	
 	
 	
@@ -165,6 +176,13 @@ public class Drawer implements GLEventListener {
 		calcMeshColor();
 	}
 
+	
+	public void setSaveImage(int mode) {
+		savemode = mode;
+		saveImageFlag = true;
+	}
+	
+	
 	public void setEdgeThreshold(double ratio) {
 		edgeDensityThreshold = ratio;
 	}
@@ -226,7 +244,8 @@ public class Drawer implements GLEventListener {
 			
 			// if colorMode is COLOR_DEGREE
 			if(colorMode == Canvas.COLOR_DEGREE) {
-				v.setColor(transparency, transparency, transparency);
+				//v.setColor(transparency, transparency, transparency);
+				v.setColor(1.0, 1.0, 1.0);
 				continue;
 			}
 				
@@ -256,8 +275,8 @@ public class Drawer implements GLEventListener {
 				v.setColor(color[0], color[1], color[2]);
 			}
 			else
-				v.setColor(transparency, transparency, transparency);
-			
+				//v.setColor(transparency, transparency, transparency);
+				v.setColor(1.0, 1.0, 1.0);
 		}
 			
 	}
@@ -290,6 +309,7 @@ public class Drawer implements GLEventListener {
 		gl.glEnable(GL2.GL_DEPTH_TEST);
 		gl.glEnable(GL2.GL_NORMALIZE);
 		gl2.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_TRUE);
+
 		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	}
@@ -299,10 +319,13 @@ public class Drawer implements GLEventListener {
 	 */
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-
+		this.glAD = drawable;
+		windowX = x;
+		windowY = y;
 		windowWidth = width;
 		windowHeight = height;
-
+		du.setWindowSize(width, height);
+		
 		// ビューポートの定義
 		gl.glViewport(0, 0, width, height);
 
@@ -320,9 +343,10 @@ public class Drawer implements GLEventListener {
 	 * 描画を実行する
 	 */
 	public void display(GLAutoDrawable drawable) {
-
+	
+		this.glAD = drawable;
 		long mill1 = System.currentTimeMillis();
-
+		
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
 		// 視点位置を決定
@@ -337,6 +361,17 @@ public class Drawer implements GLEventListener {
 		angleX = trans.getViewRotateY() * 45.0;
 		angleY = trans.getViewRotateX() * 45.0;
 
+		if(saveImageFlag == true) {
+			if(savemode == SAVE_UPPER_LEFT)
+				gl.glViewport(0, 0, windowWidth * 2, windowHeight * 2);
+			if(savemode == SAVE_UPPER_RIGHT)
+				gl.glViewport(-windowWidth, 0, windowWidth * 2, windowHeight * 2);
+			if(savemode == SAVE_LOWER_LEFT)
+				gl.glViewport(0, -windowHeight, windowWidth * 2, windowHeight * 2);
+			if(savemode == SAVE_LOWER_RIGHT)
+				gl.glViewport(-windowWidth, -windowHeight, windowWidth * 2, windowHeight * 2);
+		}
+		
 		// 行列をプッシュ
 		gl2.glPushMatrix();
 
@@ -362,12 +397,19 @@ public class Drawer implements GLEventListener {
 		gl2.glGetDoublev(GL2.GL_PROJECTION_MATRIX, projection);
 
 		// 描画
-		paintMesh();
+		//paintMesh();
+		
+		//gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        //gl.glEnable(GL.GL_BLEND);
+        //gl.glEnable(GL.GL_LINE_SMOOTH);
 		if(edgeDensityMode == Canvas.EDGE_DENSITY_DISSIMILARITY)
 			drawEdgesDissimilarity();
 		if(edgeDensityMode == Canvas.EDGE_DENSITY_DEGREE)
 			drawEdgesDegree();
-		drawPickedEdges();
+		//gl.glDisable(GL.GL_BLEND);
+	    //gl.glDisable(GL.GL_LINE_SMOOTH);
+			
+	    drawPickedEdges();
 		
 		gl.glEnable(GL2.GL_LIGHTING);
 		gl.glEnable(GL2.GL_LIGHT0);
@@ -379,6 +421,12 @@ public class Drawer implements GLEventListener {
 
 		long mill2 = System.currentTimeMillis();
 		// System.out.println("  drawer.display() time=" + (mill2 - mill1));
+		
+		if(saveImageFlag) {
+			saveImage();
+			saveImageFlag = false;
+			gl.glViewport(0, 0, windowWidth, windowHeight);
+		}
 	}
 
 	
@@ -460,7 +508,7 @@ public class Drawer implements GLEventListener {
 		if(graph.mesh == null) return;
 		
 		// Draw bundled edges
-		gl2.glColor4d(grayedgecolor[0], grayedgecolor[1], grayedgecolor[2], 0.3);
+		gl2.glColor4d(grayedgecolor[0], grayedgecolor[1], grayedgecolor[2], 0.1);
 		int mindeg = (int)((double)graph.maxDegree * (1.0 - edgeDensityThreshold));
 		
 		Mesh mesh = graph.mesh;
@@ -493,7 +541,7 @@ public class Drawer implements GLEventListener {
 	
 	void drawPickedEdges() {
 		// Draw edges of the picked node
-		gl2.glColor3d(0.8, 0.6, 0.8);
+		gl2.glColor4d(0.8, 0.6, 0.8, 0.5);
 		gl2.glLineWidth(2.0f);
 		if(pickedNode != null) {
 			double z = calcZ(pickedNode);
@@ -595,7 +643,7 @@ public class Drawer implements GLEventListener {
 			for(int j = 0; j < 2; j++) 
 				pt[j] = p0[j] * bezier0 + p1[j] * bezier1 + p2[j] * bezier2 + p3[j] * bezier3; 
 			
-			double z = (z1 * (NUM_T - i) + z2 * i) / (double)NUM_T;
+			double z = (z1 * (NUM_T - i) + z2 * i) / (double)NUM_T - 0.1;
 			gl2.glVertex3d(pt[0], pt[1], z);
 			
 		}
@@ -612,7 +660,9 @@ public class Drawer implements GLEventListener {
 		float colf[] = new float[3];
 		
 		// Draw plots
-		double SQUARE_SIZE = 0.0075 / trans.getViewScaleX();
+		double SQUARE_SIZE = 0.02 / trans.getViewScaleX();
+		if(SQUARE_SIZE > 0.01) SQUARE_SIZE = 0.01;
+		//System.out.println(" size=" + SQUARE_SIZE);
 		for(int i = 0; i < graph.nodes.size(); i++) {
 			Node node = (Node)graph.nodes.get(i);
 			double x = node.getX();
@@ -620,7 +670,7 @@ public class Drawer implements GLEventListener {
 			
 			if(colorMode == Canvas.COLOR_DEGREE) {
 				double dratio = (double)(node.getNumConnectedEdge() + node.getNumConnectingEdge()) / (double)graph.maxDegree;
-				//dratio = Math.sqrt(dratio);
+				dratio = Math.sqrt(dratio);
 				double rr = 1.0 * dratio + 0.2 * (1.0 - dratio);
 				double gg = 0.0 * dratio + 0.2 * (1.0 - dratio);
 				double bb = 0.0 * dratio + 0.2 * (1.0 - dratio);
@@ -642,12 +692,7 @@ public class Drawer implements GLEventListener {
 					colf[2] = (float)(bb * (1.0 - ke2) + ke2);
 					gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 							GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
-					gl2.glBegin(GL2.GL_POLYGON);
-					gl2.glVertex3d(x - SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x - SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x + SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x + SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-					gl2.glEnd();
+					drawOneNode(x, y, 0.0, SQUARE_SIZE);
 				}
 				continue;
 			}
@@ -657,12 +702,7 @@ public class Drawer implements GLEventListener {
 				colf[0] = colf[1] = colf[2] = 0.2f;
 				gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 						GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
-				gl2.glBegin(GL2.GL_POLYGON);
-				gl2.glVertex3d(x - SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-				gl2.glVertex3d(x - SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-				gl2.glVertex3d(x + SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-				gl2.glVertex3d(x + SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-				gl2.glEnd();
+				drawOneNode(x, y, 0.0, SQUARE_SIZE);	
 			}
 			else if(colorSwitch != null && colorSwitch[colorId] == false) {
 				continue;
@@ -690,15 +730,14 @@ public class Drawer implements GLEventListener {
 					colf[2] = (float)(bb * (1.0 - ke2) + ke2);
 					gl2.glMaterialfv(GL.GL_FRONT_AND_BACK,
 							GL2.GL_AMBIENT_AND_DIFFUSE, colf, 0);
-					gl2.glBegin(GL2.GL_POLYGON);
-					gl2.glVertex3d(x - SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x - SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x + SQUARE_SIZE, y - SQUARE_SIZE, 0.0);
-					gl2.glVertex3d(x + SQUARE_SIZE, y + SQUARE_SIZE, 0.0);
-					gl2.glEnd();
+					drawOneNode(x, y, 0.0, SQUARE_SIZE);
 				}
+				
+				//String desc = node.getDescription(0);
+				//gl2.glColor3d(rr, gg, bb);
+				//writeOneString(x, y, desc, 12);
+				//System.out.println("    " + x + "," + y + "," + desc);
 			}
-			
 		}
 		
 		
@@ -709,10 +748,25 @@ public class Drawer implements GLEventListener {
 				line += " " + pickedNode.getDescription(i);
 			glu2.gluUnProject(0.0, 0.0, 0.0, modelview, projection, viewport, p1);
 			gl2.glColor3d(0.7, 0.0, 0.0);
-			writeOneString(p1.get(0), p1.get(1), line);
+			writeOneString(p1.get(0), p1.get(1), line, 18);
 		}
 	}
 
+	
+	
+	void drawOneNode(double x, double y, double z, double size) {
+		int NUMV = 12;
+		gl2.glBegin(GL2.GL_POLYGON);
+		for(int i = 0; i < NUMV; i++) {
+			double deg = 2.0 * Math.PI * (double)i / (double)NUMV;
+			double xx = x + Math.cos(deg) * size;
+			double yy = y + Math.sin(deg) * size;
+			gl2.glVertex3d(xx, yy, z);
+		}
+		gl2.glEnd();
+	}
+	
+	
 
 	void drawOneBarWithHeight(double x, double y, double z, double SQUARE_SIZE) {
 	
@@ -797,11 +851,71 @@ public class Drawer implements GLEventListener {
 	}
 	
 	
-	void writeOneString(double x, double y, String word) {
+	void writeOneString(double x, double y, String word, int size) {
 		gl2.glRasterPos3d(x, y, 0.01);
-		glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, word);
+		if(size == 18)
+			glut.glutBitmapString(GLUT.BITMAP_HELVETICA_18, word);
+		else
+			glut.glutBitmapString(GLUT.BITMAP_HELVETICA_10, word);
 	}
 	
+	
+
+	
+	void saveImage() {
+		
+		// RGBなら3, RGBAなら4
+        int channelNum = 4;
+        int allocSize = windowWidth * windowHeight * channelNum;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(allocSize);
+        //gl2.glFlush();
+        // 読み取るOpneGLのバッファを指定 GL_FRONT:フロントバッファ　GL_BACK:バックバッファ
+        gl2.glReadBuffer( GL2.GL_BACK );
+ 
+        // OpenGLで画面に描画されている内容をバッファに格納
+        gl2.glReadPixels(0,             // 読み取る領域の左下隅のx座標
+                0,                      // 読み取る領域の左下隅のy座標
+                windowWidth,             // 読み取る領域の幅
+                windowHeight,            // 読み取る領域の高さ
+                GL2.GL_BGRA,            // 取得したい色情報の形式
+                GL2.GL_UNSIGNED_BYTE,   // 読み取ったデータを保存する配列の型
+                (Buffer) byteBuffer     // ビットマップのピクセルデータ（実際にはバイト配列）へのポインタ
+        );
+      
+        // glReadBufferで取得したデータ(ByteBuffer)をDataBufferに変換する
+        byte[] buff = byteBuffer.array();
+    	BufferedImage imageBuffer =
+				new BufferedImage(windowWidth, windowHeight, BufferedImage.TYPE_INT_RGB);
+    	
+    	for(int y = 0; y < windowHeight; y++){
+    		for(int x = 0; x < windowWidth; x++){
+    			
+    			int offset = windowWidth * (windowHeight - y - 1) * channelNum;
+    			// R
+    			int rr = (int)buff[x * channelNum + offset + 2];
+    			if(rr < 0) rr += 256;
+    			// G
+    			int gg = (int)buff[x * channelNum + offset + 1];
+    			if(gg < 0) gg += 256;
+    			// B
+    			int bb = (int)buff[x * channelNum + offset + 0];
+    			if(bb < 0) bb += 256;
+    			
+    			Color color = new Color(rr, gg, bb);
+    			int value = color.getRGB();
+    			imageBuffer.setRGB(x, y, value);
+            }
+        }
+        
+    	String filename = "tmp" + Integer.toString(savemode) + ".png";
+        try {
+            ImageIO.write(imageBuffer, "png", new File(filename));
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        
+	}
+
 	
 	@Override
 	public void dispose(GLAutoDrawable arg0) {

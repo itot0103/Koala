@@ -1,57 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/gluegen-gl.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/gluegen-rt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/gluegen-rt-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.all.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.all-noawt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.awt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.core.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.egl.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gldesktop.dbg.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gldesktop.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gles1.dbg.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gles1.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gles2.dbg.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.gles2.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.glu.gldesktop.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.glu.mipmap.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.glu.tess.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.os.osx.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.os.win.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.os.x11.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.sdk.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.test.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.util.awt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.util.fixedfuncemu.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.util.gldesktop.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl.util.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/jogl-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.all.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.all-noawt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.awt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.core.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.os.win.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow.os.x11.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/nativewindow-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.all.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.all-noawt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.awt.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.core.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.event.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.hw.broadcomegl.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.hw.intelgdl.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.ogl.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.os.osx.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.os.win.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt.os.x11.jar"/>
-	<classpathentry kind="lib" path="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/jar/newt-natives-windows-amd64.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JOGL2.0">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/itot/projects/utility/jogl-2.0-b23-20110303-windows-amd64/lib"/>
+			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogl-dll">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/itot/projects/utility/jogamp-all-platforms-2.3.2/lib/windows-amd64"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/itot/projects/utility/jogamp-all-platforms-2.3.2/jar/win-i586/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/utility/jogamp-all-platforms-2.3.2/jar/win-i586/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/utility/jogamp-all-platforms-2.3.2/jar/win-i586/jogl-all.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/utility/jogamp-all-platforms-2.3.2/jar/win-i586/jogl-all-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/GraphVis/Koala/lib/clustering.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/GraphVis/Koala/lib/mdsj.jar"/>
+	<classpathentry kind="lib" path="C:/itot/projects/GraphVis/Koala/lib/weka-3.7.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
